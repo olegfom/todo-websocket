@@ -1,0 +1,10 @@
+The Spring Boot WebSocket example code that triggers Application Events and communicates to a WebPage using WebSocket.
+
+1. Uses Custom Controller (ToDoController)
+curl -XPOST -d '{"description":"Learn to play Guitar"}' -H "Content-Type:application/json" http://localhost:8080/api/todo
+
+2. Uses JPA Events (just comment out @RestController and @RequestMapping("/api") annotations in ToDoController.
+curl -XPOST -d '{"description":"Learn to play Guitar"}' -H "Content-Type:application/json" http://localhost:8080/api/toDos
+
+
+ 
