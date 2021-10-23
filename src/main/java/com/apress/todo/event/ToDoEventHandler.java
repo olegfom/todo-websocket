@@ -27,6 +27,7 @@ public class ToDoEventHandler {
 
     @HandleAfterCreate
     public void handleToDoSave(ToDo toDo){
+    	log.info("Inside HandleAfterCreate");
     	this.simpMessagingTemplate.convertAndSend(this.toDoProperties.getBroker() + "/new",toDo);
         log.info(">> Sending Message to WS: ws://todo/new - " + toDo);
     }

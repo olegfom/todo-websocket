@@ -6,7 +6,10 @@ import com.apress.todo.event.ToDoEventHandler;
 import com.apress.todo.repository.ToDoRepository;
 import com.apress.todo.validation.ToDoValidationError;
 import com.apress.todo.validation.ToDoValidationErrorBuilder;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.rest.core.event.AfterCreateEvent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,11 +24,13 @@ import java.util.Optional;
 public class ToDoController {
     private ToDoRepository toDoRepository;
     private ToDoEventHandler toDoEventHandler;
+    private ApplicationEventPublisher publisher;
 
     @Autowired
-    public ToDoController(ToDoRepository toDoRepository, ToDoEventHandler toDoEventHandler) {
+    public ToDoController(ToDoRepository toDoRepository, ToDoEventHandler toDoEventHandler, ApplicationEventPublisher publisher) {
         this.toDoRepository = toDoRepository;
         this.toDoEventHandler = toDoEventHandler;
+        this.publisher = publisher;       
     }    
     
     @GetMapping("/todo")
@@ -58,7 +63,8 @@ public class ToDoController {
             return ResponseEntity.badRequest().body(ToDoValidationErrorBuilder.fromBindingErrors(errors));
         }
         ToDo result = toDoRepository.save(toDo);
-        toDoEventHandler.handleToDoSave(toDo);
+        publisher.publishEvent(new AfterCreateEvent(result));
+        //toDoEventHandler.handleToDoSave(toDo);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(result.getId()).toUri();
         return ResponseEntity.created(location).build();
     }
